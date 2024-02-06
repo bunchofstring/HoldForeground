@@ -5,24 +5,28 @@ This repo contains an Android app implementation that satisfies some relatively 
 2. GUI remains in the foreground and blocks other apps from becoming visible
 3. Starts automatically on boot*
 4. Recovers from a crash automatically**
+
 \* Due to Android-security restrictions, the app must be manually started initially after installation.
-\*\* Android OS inclused protection against crash loops (i.e. backoff delay).
+<br>\*\* Android OS includes countermeasures against against crash loops (i.e. backoff delay).
 
 # Requirements
-Non-Functional Requirements
+**Non-Functional Requirements**
 1. Compatible with Android 12L, 13, and 14
 2. Integrated as a userspace app (as opposed to a privileged system app which is typically build into the Android-based platform itself)
 3. Discourage the OS from killing the app in the event of memory and/or CPU pressure*
+4. Implemented in Kotlin
+5. GUI implemented Jetpack Compose
+
 \* Note that 100% availability would require integration as a privileged system app
 
-Functional Requirements
+**Functional Requirements**
 1. Fill all available screen real estate on the primary display
 2. Prevent other apps from becoming visible (even if the other app is launched programmatically)
 3. Initialize when the system starts
 4. In the event of a crash, the GUI should reappear within a moment
 
 # Build and Install
-TODO
+Recommendation is to use Android Studio. Details of how to do this are not the focus of this documentation.
 
 # Operations
 Start the service
