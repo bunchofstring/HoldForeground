@@ -6,11 +6,7 @@ import android.graphics.PixelFormat
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Recomposer
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.compositionContext
@@ -22,30 +18,28 @@ import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+class Overlay(context: Context, fullScreen: Boolean = true): ScreenLifecycleControl {
 
-class Overlay(context: Context): ScreenLifecycleControl {
-
+    private val windowManager = context.getSystemService(WINDOW_SERVICE) as WindowManager
     private val composeView = ComposeView(context).apply {
-        fitsSystemWindows = false
-        setContent {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colorScheme.background
-            ) {
-                CustomContent()
+        if(fullScreen) {
+            setOnApplyWindowInsetsListener { view, windowInsets ->
+                windowInsetsController?.run {
+                    systemBarsBehavior =
+                        WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                    hide(WindowInsets.Type.systemBars())
+                }
+                view.onApplyWindowInsets(windowInsets)
             }
+        }else{
+            fitsSystemWindows = true
         }
-        setOnApplyWindowInsetsListener { view, windowInsets ->
-            windowInsetsController?.run {
-                systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-                hide(WindowInsets.Type.systemBars())
-            }
-            view.onApplyWindowInsets(windowInsets)
+        setContent {
+            CustomContent()
         }
     }
-    private val windowManager = context.getSystemService(WINDOW_SERVICE) as WindowManager
 
-    override fun show() {
+    init {
         val lifecycleOwner = MyLifecycleOwner()
         val coroutineContext = AndroidUiDispatcher.CurrentThread
         val recomposer = Recomposer(coroutineContext)
@@ -65,20 +59,17 @@ class Overlay(context: Context): ScreenLifecycleControl {
         CoroutineScope(coroutineContext).launch {
             recomposer.runRecomposeAndApplyChanges()
         }
-
-        windowManager.addView(
-            composeView,
-            WindowManager.LayoutParams(
-                WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
-                PixelFormat.TRANSLUCENT
-            )
-        )
     }
 
-    override fun dismiss() {
-        windowManager.removeView(composeView)
-    }
+    override fun show() = windowManager.addView(composeView, getLayoutParams())
+
+    override fun dismiss() = windowManager.removeView(composeView)
+
+    private fun getLayoutParams() = WindowManager.LayoutParams(
+        WindowManager.LayoutParams.MATCH_PARENT,
+        WindowManager.LayoutParams.MATCH_PARENT,
+        WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+        WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+        PixelFormat.TRANSLUCENT
+    )
 }

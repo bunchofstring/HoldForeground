@@ -24,7 +24,7 @@ class DaemonService: Service() {
         }
     }
 
-    private val overlay: ScreenLifecycleControl by lazy { Overlay(applicationContext) }
+    private val overlay: ScreenLifecycleControl by lazy { Overlay(applicationContext, true) }
 
     override fun onCreate() {
         super.onCreate()
