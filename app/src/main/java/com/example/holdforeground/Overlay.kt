@@ -3,10 +3,16 @@ package com.example.holdforeground
 import android.content.Context
 import android.content.Context.WINDOW_SERVICE
 import android.graphics.PixelFormat
+import android.view.Gravity
+import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
 import androidx.compose.runtime.Recomposer
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.compositionContext
@@ -24,18 +30,15 @@ class Overlay(context: Context, fullScreen: Boolean = true): ScreenLifecycleCont
     private val composeView = ComposeView(context).apply {
         if(fullScreen) {
             setOnApplyWindowInsetsListener { view, windowInsets ->
-                windowInsetsController?.run {
-                    systemBarsBehavior =
-                        WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-                    hide(WindowInsets.Type.systemBars())
-                }
-                view.onApplyWindowInsets(windowInsets)
+                onApplyWindowInsets(windowInsetsController, view, windowInsets)
             }
         }else{
             fitsSystemWindows = true
         }
         setContent {
-            CustomContent()
+            var minimized by remember { mutableStateOf(false) }
+            if(minimized) CustomContentMinimized(onMaximize = { minimized = false })
+            else CustomContent(onMinimize = { minimized = true })
         }
     }
 
@@ -52,7 +55,7 @@ class Overlay(context: Context, fullScreen: Boolean = true): ScreenLifecycleCont
         composeView.run {
             setViewTreeSavedStateRegistryOwner(lifecycleOwner)
             setViewTreeLifecycleOwner(lifecycleOwner)
-            setViewTreeViewModelStoreOwner(composeView.findViewTreeViewModelStoreOwner())
+            setViewTreeViewModelStoreOwner(findViewTreeViewModelStoreOwner())
             compositionContext = recomposer
         }
 
@@ -67,9 +70,23 @@ class Overlay(context: Context, fullScreen: Boolean = true): ScreenLifecycleCont
 
     private fun getLayoutParams() = WindowManager.LayoutParams(
         WindowManager.LayoutParams.MATCH_PARENT,
-        WindowManager.LayoutParams.MATCH_PARENT,
+        WindowManager.LayoutParams.WRAP_CONTENT,
         WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-        WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+        WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
         PixelFormat.TRANSLUCENT
-    )
+    ).apply {
+        gravity = Gravity.TOP
+    }
+
+    private fun onApplyWindowInsets(
+        windowInsetsController: WindowInsetsController?,
+        view: View,
+        windowInsets: WindowInsets?,
+    ) : WindowInsets {
+        windowInsetsController?.run {
+            systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            hide(WindowInsets.Type.systemBars())
+        }
+        return view.onApplyWindowInsets(windowInsets)
+    }
 }

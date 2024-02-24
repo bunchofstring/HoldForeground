@@ -45,15 +45,18 @@ class DaemonService: Service() {
     override fun onBind(p0: Intent?) = null
 
     private fun createNotificationChannel() {
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channel = NotificationChannel(
+        NotificationChannel(
             CHANNEL_ID,
             CHANNEL_NAME,
             NotificationManager.IMPORTANCE_DEFAULT
         ).apply {
             description = CHANNEL_DESCRIPTION
-        }
-        notificationManager.createNotificationChannel(channel)
+        }.let(::getNotificationChannel)
+    }
+
+    private fun getNotificationChannel(notificationChannel: NotificationChannel) {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(notificationChannel)
     }
 
     private fun startForeground() = ServiceCompat.startForeground(
