@@ -68,8 +68,8 @@ class DaemonService: Service() {
 
     private fun getNotification() = NotificationCompat.Builder(this, CHANNEL_ID)
         .setSmallIcon(android.R.drawable.ic_lock_lock)
-        .setContentTitle("A")
-        .setContentText("B")
+        .setContentTitle("Holding the foreground")
+        .setContentText("Always visible with few exceptions")
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         .build()
 

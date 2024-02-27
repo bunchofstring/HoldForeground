@@ -43,7 +43,7 @@ fun CustomContent(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = "Hold Foreground",
+                    text = "Hold the Foreground",
                     style = typography.displayMedium,
                     textAlign = TextAlign.Center,
                 )
