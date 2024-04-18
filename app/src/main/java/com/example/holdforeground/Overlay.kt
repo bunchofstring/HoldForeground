@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Context.WINDOW_SERVICE
 import android.graphics.PixelFormat
 import android.view.Gravity
-import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
@@ -24,22 +23,23 @@ import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-class Overlay(context: Context, fullScreen: Boolean = true): ScreenLifecycleControl {
+class Overlay(context: Context) : ScreenLifecycleControl {
 
     private val windowManager = context.getSystemService(WINDOW_SERVICE) as WindowManager
     private val composeView = ComposeView(context).apply {
-        if(fullScreen) {
-            setOnApplyWindowInsetsListener { view, windowInsets ->
-                onApplyWindowInsets(windowInsetsController, view, windowInsets)
-            }
-        }else{
-            fitsSystemWindows = true
-        }
+        fitsSystemWindows = false
         setContent {
             var minimized by remember { mutableStateOf(false) }
-            if(minimized) CustomContentMinimized(onMaximize = { minimized = false })
-            else CustomContent(onMinimize = { minimized = true })
+            when (minimized) {
+                true -> CustomContentMinimized(onMaximize = { minimized = false })
+                false -> CustomContent(onMinimize = { minimized = true })
+            }
+
+            windowInsetsController?.let {
+                setInsetsVisible(this, it, !minimized)
+            }
         }
+        fitsSystemWindows = false
     }
 
     init {
@@ -73,20 +73,26 @@ class Overlay(context: Context, fullScreen: Boolean = true): ScreenLifecycleCont
         WindowManager.LayoutParams.WRAP_CONTENT,
         WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
         WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
-        PixelFormat.TRANSLUCENT
+        PixelFormat.TRANSLUCENT,
     ).apply {
         gravity = Gravity.TOP
     }
 
-    private fun onApplyWindowInsets(
-        windowInsetsController: WindowInsetsController?,
-        view: View,
-        windowInsets: WindowInsets?,
-    ) : WindowInsets {
-        windowInsetsController?.run {
-            systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-            hide(WindowInsets.Type.systemBars())
+    private fun setInsetsVisible(composeView: ComposeView, windowInsetsController: WindowInsetsController, visible: Boolean) {
+        composeView.setOnApplyWindowInsetsListener { view, windowInsets ->
+            windowInsetsController.run {
+                when (visible) {
+                    true -> {
+                        systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                        hide(WindowInsets.Type.systemBars())
+                    }
+                    false -> {
+                        systemBarsBehavior = WindowInsetsController.BEHAVIOR_DEFAULT
+                        show(WindowInsets.Type.systemBars())
+                    }
+                }
+            }
+            return@setOnApplyWindowInsetsListener view.onApplyWindowInsets(windowInsets)
         }
-        return view.onApplyWindowInsets(windowInsets)
     }
 }

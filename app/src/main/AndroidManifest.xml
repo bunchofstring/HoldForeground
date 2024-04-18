@@ -24,8 +24,9 @@
         </receiver>
 
         <service
-            android:name=".DaemonService"
+            android:name=".HoldForegroundService"
             android:foregroundServiceType="specialUse"
+            android:label="app"
             android:exported="true">
         </service>
 

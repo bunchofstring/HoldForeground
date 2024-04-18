@@ -18,11 +18,11 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CustomContent(
-    onMinimize: () -> Unit
+    onMinimize: () -> Unit,
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+        color = MaterialTheme.colorScheme.background,
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically),
