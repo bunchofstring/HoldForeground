@@ -27,7 +27,6 @@ class Overlay(context: Context) : ScreenLifecycleControl {
 
     private val windowManager = context.getSystemService(WINDOW_SERVICE) as WindowManager
     private val composeView = ComposeView(context).apply {
-        fitsSystemWindows = false
         setContent {
             var minimized by remember { mutableStateOf(false) }
             when (minimized) {
@@ -39,7 +38,6 @@ class Overlay(context: Context) : ScreenLifecycleControl {
                 setInsetsVisible(this, it, !minimized)
             }
         }
-        fitsSystemWindows = false
     }
 
     init {
