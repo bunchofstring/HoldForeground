@@ -33,9 +33,8 @@ class Overlay(context: Context) : ScreenLifecycleControl {
                 true -> CustomContentMinimized(onMaximize = { minimized = false })
                 false -> CustomContent(onMinimize = { minimized = true })
             }
-
             windowInsetsController?.let {
-                setInsetsVisible(this, it, !minimized)
+                setSystemBarsVisible(it, minimized)
             }
         }
     }
@@ -76,21 +75,18 @@ class Overlay(context: Context) : ScreenLifecycleControl {
         gravity = Gravity.TOP
     }
 
-    private fun setInsetsVisible(composeView: ComposeView, windowInsetsController: WindowInsetsController, visible: Boolean) {
-        composeView.setOnApplyWindowInsetsListener { view, windowInsets ->
-            windowInsetsController.run {
-                when (visible) {
-                    true -> {
-                        systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-                        hide(WindowInsets.Type.systemBars())
-                    }
-                    false -> {
-                        systemBarsBehavior = WindowInsetsController.BEHAVIOR_DEFAULT
-                        show(WindowInsets.Type.systemBars())
-                    }
+    private fun setSystemBarsVisible(windowInsetsController: WindowInsetsController, visible: Boolean) {
+        windowInsetsController.run {
+            when (visible) {
+                true -> {
+                    systemBarsBehavior = WindowInsetsController.BEHAVIOR_DEFAULT
+                    show(WindowInsets.Type.systemBars())
+                }
+                false -> {
+                    systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                    hide(WindowInsets.Type.systemBars())
                 }
             }
-            return@setOnApplyWindowInsetsListener view.onApplyWindowInsets(windowInsets)
         }
     }
 }
