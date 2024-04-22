@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun CustomContentMinimized(onMaximize: () -> Unit) {
     Surface(
-        color = MaterialTheme.colorScheme.background
+        color = MaterialTheme.colorScheme.background,
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically),

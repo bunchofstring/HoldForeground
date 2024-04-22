@@ -3,8 +3,8 @@ package com.example.holdforeground
 import android.content.Context
 import android.content.Context.WINDOW_SERVICE
 import android.graphics.PixelFormat
+import android.os.Bundle
 import android.view.Gravity
-import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
@@ -17,33 +17,35 @@ import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.compositionContext
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
+import androidx.savedstate.SavedStateRegistry
+import androidx.savedstate.SavedStateRegistryController
+import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-class Overlay(context: Context, fullScreen: Boolean = true): ScreenLifecycleControl {
+class Overlay(context: Context) : HoldForegroundService.ScreenLifecycleControl {
 
     private val windowManager = context.getSystemService(WINDOW_SERVICE) as WindowManager
     private val composeView = ComposeView(context).apply {
-        if(fullScreen) {
-            setOnApplyWindowInsetsListener { view, windowInsets ->
-                onApplyWindowInsets(windowInsetsController, view, windowInsets)
-            }
-        }else{
-            fitsSystemWindows = true
-        }
         setContent {
             var minimized by remember { mutableStateOf(false) }
-            if(minimized) CustomContentMinimized(onMaximize = { minimized = false })
-            else CustomContent(onMinimize = { minimized = true })
+            when (minimized) {
+                true -> CustomContentMinimized(onMaximize = { minimized = false })
+                false -> CustomContent(onMinimize = { minimized = true })
+            }
+            windowInsetsController?.let {
+                setSystemBarsVisible(it, minimized)
+            }
         }
     }
 
     init {
-        val lifecycleOwner = MyLifecycleOwner()
+        val lifecycleOwner = OverlayLifecycleOwner()
         val coroutineContext = AndroidUiDispatcher.CurrentThread
         val recomposer = Recomposer(coroutineContext)
 
@@ -73,20 +75,40 @@ class Overlay(context: Context, fullScreen: Boolean = true): ScreenLifecycleCont
         WindowManager.LayoutParams.WRAP_CONTENT,
         WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
         WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
-        PixelFormat.TRANSLUCENT
+        PixelFormat.TRANSLUCENT,
     ).apply {
         gravity = Gravity.TOP
     }
 
-    private fun onApplyWindowInsets(
-        windowInsetsController: WindowInsetsController?,
-        view: View,
-        windowInsets: WindowInsets?,
-    ) : WindowInsets {
-        windowInsetsController?.run {
-            systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-            hide(WindowInsets.Type.systemBars())
+    private fun setSystemBarsVisible(windowInsetsController: WindowInsetsController, visible: Boolean) {
+        windowInsetsController.run {
+            when (visible) {
+                true -> {
+                    systemBarsBehavior = WindowInsetsController.BEHAVIOR_DEFAULT
+                    show(WindowInsets.Type.systemBars())
+                }
+                false -> {
+                    systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                    hide(WindowInsets.Type.systemBars())
+                }
+            }
         }
-        return view.onApplyWindowInsets(windowInsets)
+    }
+
+    private class OverlayLifecycleOwner : SavedStateRegistryOwner {
+        private var mLifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
+        private var mSavedStateRegistryController: SavedStateRegistryController = SavedStateRegistryController.create(this)
+
+        fun handleLifecycleEvent(event: Lifecycle.Event) {
+            mLifecycleRegistry.handleLifecycleEvent(event)
+        }
+        fun performRestore(savedState: Bundle?) {
+            mSavedStateRegistryController.performRestore(savedState)
+        }
+
+        override val lifecycle: Lifecycle
+            get() = mLifecycleRegistry
+        override val savedStateRegistry: SavedStateRegistry
+            get() = mSavedStateRegistryController.savedStateRegistry
     }
 }
