@@ -1,4 +1,4 @@
-package com.example.holdforeground
+package com.example.holdforeground.daemon
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -10,6 +10,14 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
+
+/**
+ * A "Daemon" brings high availability (like a system service) to userspace apps. This document
+ * represents the source of truth regarding documentation. There are three components of a "Daemon"
+ * 1. Service: DaemonService or a subclass (has a DaemonControlCompanion or a subclass)
+ * 2. Receiver: DaemonOnBootReceiver or a subclass
+ * 3. AndroidManifest declarations for Service and Receiver
+ */
 
 open class DaemonService : Service() {
 
@@ -73,9 +81,11 @@ open class DaemonService : Service() {
 
     private fun getNotificationManager() = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-    protected interface DaemonControlCompanion {
-        fun start(context: Context) = context.startForegroundService(
-            Intent(context, javaClass.enclosingClass),
-        )
+    interface DaemonControlCompanion {
+        fun start(context: Context) {
+            context.startForegroundService(
+                Intent(context, javaClass.enclosingClass),
+            )
+        }
     }
 }

@@ -2,6 +2,7 @@ package com.example.holdforeground
 
 import android.content.Intent
 import androidx.core.app.NotificationCompat
+import com.example.holdforeground.daemon.DaemonService
 
 class HoldForegroundService : DaemonService() {
 
@@ -29,9 +30,9 @@ class HoldForegroundService : DaemonService() {
             }
         }
     }
-}
 
-interface ScreenLifecycleControl {
-    fun show()
-    fun dismiss()
+    interface ScreenLifecycleControl {
+        fun show()
+        fun dismiss()
+    }
 }

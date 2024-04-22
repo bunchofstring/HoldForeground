@@ -3,6 +3,7 @@ package com.example.holdforeground
 import android.content.Context
 import android.content.Context.WINDOW_SERVICE
 import android.graphics.PixelFormat
+import android.os.Bundle
 import android.view.Gravity
 import android.view.WindowInsets
 import android.view.WindowInsetsController
@@ -16,14 +17,18 @@ import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.compositionContext
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
+import androidx.savedstate.SavedStateRegistry
+import androidx.savedstate.SavedStateRegistryController
+import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-class Overlay(context: Context) : ScreenLifecycleControl {
+class Overlay(context: Context) : HoldForegroundService.ScreenLifecycleControl {
 
     private val windowManager = context.getSystemService(WINDOW_SERVICE) as WindowManager
     private val composeView = ComposeView(context).apply {
@@ -40,7 +45,7 @@ class Overlay(context: Context) : ScreenLifecycleControl {
     }
 
     init {
-        val lifecycleOwner = MyLifecycleOwner()
+        val lifecycleOwner = OverlayLifecycleOwner()
         val coroutineContext = AndroidUiDispatcher.CurrentThread
         val recomposer = Recomposer(coroutineContext)
 
@@ -88,5 +93,22 @@ class Overlay(context: Context) : ScreenLifecycleControl {
                 }
             }
         }
+    }
+
+    private class OverlayLifecycleOwner : SavedStateRegistryOwner {
+        private var mLifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
+        private var mSavedStateRegistryController: SavedStateRegistryController = SavedStateRegistryController.create(this)
+
+        fun handleLifecycleEvent(event: Lifecycle.Event) {
+            mLifecycleRegistry.handleLifecycleEvent(event)
+        }
+        fun performRestore(savedState: Bundle?) {
+            mSavedStateRegistryController.performRestore(savedState)
+        }
+
+        override val lifecycle: Lifecycle
+            get() = mLifecycleRegistry
+        override val savedStateRegistry: SavedStateRegistry
+            get() = mSavedStateRegistryController.savedStateRegistry
     }
 }

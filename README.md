@@ -46,3 +46,5 @@ Simulate a crash
 ```
 adb shell am crash com.example.holdforeground
 ```
+# Reuse Opportunities
+1. app/src/main/java/com/example/holdforeground/daemon/DaemonService.kt

@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HoldForeground">
 
-        <receiver android:name=".OnBootReceiver"
+        <receiver android:name=".HoldForegroundOnBootReceiver"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED"
             android:exported="true">
             <intent-filter>
