@@ -47,7 +47,7 @@ The following user interface is available for testing purposes.
    ```
 
 ## Graphical User Interface
-The overlay implementation expects custom content based on Jetpack Compose. A GUI reference implementation is included to hint at what is possible. In addition to the standard features above, it implements the following:
+A reference implementation is included to hint at what is possible. In addition to the features mentioned above, it implements the following:
 1. Briefly describes the app itself
 2. User can tap a button to "minimize" the size of the overlay, thereby revealing content underneath
 3. User can tap a button to "maximize" the overlay size to full screen
