@@ -12,7 +12,7 @@ This repo contains an Android app implementation that satisfies some relatively 
 # Requirements
 **Non-Functional Requirements**
 1. Compatible with Android 12L, 13, and 14
-2. Integrated as a userspace app (as opposed to a privileged system app which is typically build into the Android-based platform itself)
+2. Integrated as a userspace app (as opposed to a privileged system app which is typically built into the Android-based platform itself)
 3. Discourage the OS from killing the app in the event of memory and/or CPU pressure*
 4. Implemented in Kotlin
 5. GUI implemented Jetpack Compose
@@ -70,4 +70,4 @@ adb shell am crash com.example.holdforeground
 1. On an Android 12L device, when the app loads initially (e.g. after reboot), the system bars may not hide as expected. To recover and hide the system bars, tap one of the navigation icons like Home or the App Drawer. Note that this issue is not present on Android 13. 
 
 # Reuse Opportunities
-1. app/src/main/java/com/example/holdforeground/daemon/DaemonService.kt
+1. [DaemonService.kt](app/src/main/java/com/example/holdforeground/daemon/DaemonService.kt)
