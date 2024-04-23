@@ -29,22 +29,37 @@ This repo contains an Android app implementation that satisfies some relatively 
 Recommendation is to use Android Studio. Details of how to do this are not the focus of this documentation.
 
 # Operations
-Start the service
-```
-adb shell am start-foreground-service com.example.holdforeground/.DaemonService
-```
-Show the GUI
-```
-adb shell am start-foreground-service -a ACTION_SHOW com.example.holdforeground/.DaemonService
-```
-Dismiss the GUI
-```
-adb shell am start-foreground-service -a ACTION_DISMISS com.example.holdforeground/.DaemonService
-```
+
+## Command Line User Interface
+The following user interface is available for testing purposes.
+
+1. Start the service
+   ```
+   adb shell am start-foreground-service com.example.holdforeground/.DaemonService
+   ```
+2. Show the GUI
+   ```
+   adb shell am start-foreground-service -a ACTION_SHOW com.example.holdforeground/.DaemonService
+   ```
+3. Dismiss the GUI
+   ```
+   adb shell am start-foreground-service -a ACTION_DISMISS com.example.holdforeground/.DaemonService
+   ```
+
+## Graphical User Interface
+The overlay implementation expects custom content based on Jetpack Compose. A GUI reference implementation is included to hint at what is possible. In addition to the standard features above, it implements the following:
+1. Briefly describes the app itself
+2. User can tap a button to "minimize" the size of the overlay, thereby revealing content underneath
+3. User can tap a button to "maximize" the overlay size to full screen
+4. While minimized, user can interact with underlying content (within its visible bounds)
+
 # Testing
 Simulate a crash
 ```
 adb shell am crash com.example.holdforeground
 ```
+# Known Issues
+1. On an Android 12L device, when the app loads initially (e.g. after reboot), the system bars may not hide as expected. To recover and hide the system bars, tap one of the navigation icons like Home or the App Drawer. Note that this issue is not present on Android 13. 
+
 # Reuse Opportunities
 1. app/src/main/java/com/example/holdforeground/daemon/DaemonService.kt
