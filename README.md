@@ -28,7 +28,7 @@ This repo contains an Android app implementation that satisfies some relatively 
 # Build and Install
 Recommendation is to use Android Studio. Details of how to do this are not the focus of this documentation.
 
-# Operations
+# Operation
 
 ## Command Line User Interface
 The following user interface is available for testing purposes.
