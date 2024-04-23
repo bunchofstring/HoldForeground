@@ -26,7 +26,9 @@ This repo contains an Android app implementation that satisfies some relatively 
 4. In the event of a crash, the GUI should reappear within a moment
 
 # Build and Install
-Note that some runtime permissions are required. Rather that implement the runtime prompts, suggestion is to leverage the `-g` flag when installing the APK. This ensures that permissions are granted at install time. Recommendation is to use Android Studio - which can leverage a custom build configuration stored in the repo at [app.run.xml](.run/app.run.xml). Details of how to do this are not the focus of this documentation.
+Note that some runtime permissions are required. However, this implementation does not include runtime prompts. Suggestion is to leverage the `-g` flag when installing the APK. This ensures that permissions are granted at install time.
+
+Recommendation is to use Android Studio - which can leverage a custom build configuration stored in the repo at [app.run.xml](.run/app.run.xml). Details of how to do this are not the focus of this documentation.
 
 # Operation
 
