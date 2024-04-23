@@ -5,14 +5,8 @@ import android.content.Context.WINDOW_SERVICE
 import android.graphics.PixelFormat
 import android.os.Bundle
 import android.view.Gravity
-import android.view.WindowInsets
-import android.view.WindowInsetsController
 import android.view.WindowManager
 import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.compositionContext
@@ -31,18 +25,7 @@ import kotlinx.coroutines.launch
 class Overlay(context: Context) : HoldForegroundService.ScreenLifecycleControl {
 
     private val windowManager = context.getSystemService(WINDOW_SERVICE) as WindowManager
-    private val composeView = ComposeView(context).apply {
-        setContent {
-            var minimized by remember { mutableStateOf(false) }
-            when (minimized) {
-                true -> CustomContentMinimized(onMaximize = { minimized = false })
-                false -> CustomContent(onMinimize = { minimized = true })
-            }
-            windowInsetsController?.let {
-                setSystemBarsVisible(it, minimized)
-            }
-        }
-    }
+    private val composeView = CustomComposeView.from(context)
 
     init {
         val lifecycleOwner = OverlayLifecycleOwner()
@@ -80,21 +63,6 @@ class Overlay(context: Context) : HoldForegroundService.ScreenLifecycleControl {
         gravity = Gravity.TOP
     }
 
-    private fun setSystemBarsVisible(windowInsetsController: WindowInsetsController, visible: Boolean) {
-        windowInsetsController.run {
-            when (visible) {
-                true -> {
-                    systemBarsBehavior = WindowInsetsController.BEHAVIOR_DEFAULT
-                    show(WindowInsets.Type.systemBars())
-                }
-                false -> {
-                    systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-                    hide(WindowInsets.Type.systemBars())
-                }
-            }
-        }
-    }
-
     private class OverlayLifecycleOwner : SavedStateRegistryOwner {
         private var mLifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
         private var mSavedStateRegistryController: SavedStateRegistryController = SavedStateRegistryController.create(this)
@@ -110,5 +78,9 @@ class Overlay(context: Context) : HoldForegroundService.ScreenLifecycleControl {
             get() = mLifecycleRegistry
         override val savedStateRegistry: SavedStateRegistry
             get() = mSavedStateRegistryController.savedStateRegistry
+    }
+
+    interface CustomComposeViewFactory {
+        fun from(context: Context): ComposeView
     }
 }
