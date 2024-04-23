@@ -25,6 +25,15 @@ This repo contains an Android app implementation that satisfies some relatively 
 3. Initialize when the system starts
 4. In the event of a crash, the GUI should reappear within a moment
 
+# Developer Customization
+In order to be open for extension and closed for modification (i.e. open-closed principle), developers are encouraged to change the following files to suite different needs. Note that interfaces and superclasses are provided.
+1. Change overlay appearance and behavior
+   [CustomComposeView.kt](app/src/main/java/com/example/holdforeground/CustomComposeView.kt) and any composables referenced inside
+2. Change notification appearance and behavior
+   [HoldForegroundService.kt](app/src/main/java/com/example/holdforeground/HoldForegroundService.kt)
+3. Change app icon and name
+   [Drawables and String resources](app/src/main/res)
+
 # Build and Install
 Note that some runtime permissions are required. However, this implementation does not include runtime prompts. Suggestion is to leverage the `-g` flag when installing the APK. This ensures that permissions are granted at install time.
 
