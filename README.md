@@ -55,9 +55,11 @@ A reference implementation is included to hint at what is possible. In addition 
 3. User can tap a button to "maximize" the overlay size to full screen
 4. While minimized, user can interact with underlying content (within its visible bounds)
 
-[holdforeground_demo.mp4](doc/holdforeground_demo.mp4)
+A video is available at [holdforeground_demo.mp4](doc/holdforeground_demo.mp4)
 
-![](doc/holdforeground_demo.mp4)
+| Launcher icon | Maximized | Minimized |
+| :---: | :---: | :---: |
+| ![](doc/app_in_launcher.png) | ![](doc/app_maximized.png) | ![](doc/app_minimized.png) |
 
 # Testing
 Simulate a crash
