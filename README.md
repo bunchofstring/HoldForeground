@@ -55,6 +55,8 @@ A reference implementation is included to hint at what is possible. In addition 
 3. User can tap a button to "maximize" the overlay size to full screen
 4. While minimized, user can interact with underlying content (within its visible bounds)
 
+![](doc/holdforeground_demo.mp4)
+
 # Testing
 Simulate a crash
 ```
