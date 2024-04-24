@@ -37,7 +37,7 @@ In order to be open for extension and closed for modification (i.e. open-closed 
 # Build and Install
 Note that some runtime permissions are required. However, this implementation does not include runtime prompts. Suggestion is to leverage the `-g` flag when installing the APK. This ensures that permissions are granted at install time.
 
-Recommendation is to use Android Studio - which can leverage a custom build configuration stored in the repo at [app.run.xml](.run/app.run.xml). Details of how to do this are not the focus of this documentation.
+Recommendation is to use Android Studio - which can leverage a custom configuration stored in the repo at [app.run.xml](.run/app.run.xml). Details of how to do this are not the focus of this documentation.
 
 # Operation
 
